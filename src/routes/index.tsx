@@ -9,7 +9,7 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/settings" element={<Settings />} />
-      <Route path="/widget-settings" element={<WidgetSettings />} />
+      <Route path="/widget-settings/:id" element={<WidgetSettings />} />
     </Routes>
   );
 };

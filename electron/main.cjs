@@ -1,5 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+// const WidgetManager = require('./widget-manager.cjs');
+let WidgetManager;
+
 
 const isDev = !app.isPackaged;
 
@@ -54,7 +57,10 @@ ipcMain.on('window-close', (event) => {
   if (win) win.close();
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  const mod = await import('./widget-manager.js');
+  WidgetManager = mod.default;
+  await WidgetManager.init();
   createWindow();
 
   app.on('activate', () => {
