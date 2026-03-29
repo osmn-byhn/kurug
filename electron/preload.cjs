@@ -26,5 +26,8 @@ contextBridge.exposeInMainWorld('electron', {
     launchStandalone: (id) => ipcRenderer.invoke('widget:launch-standalone', id),
     stopAll: () => ipcRenderer.invoke('widget:stop-all'),
     killAll: () => ipcRenderer.invoke('widget:kill-all'),
+    fetch: (id) => ipcRenderer.invoke('widget:fetch', id),
+    pull: (id) => ipcRenderer.invoke('widget:pull', id),
+    checkUpdate: (id) => ipcRenderer.invoke('widget:check-update', id),
   },
 });

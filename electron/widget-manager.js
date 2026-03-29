@@ -64,6 +64,18 @@ class WidgetManager {
     ipcMain.handle('widget:remove', async (event, id) => {
       return await this.remove(id);
     });
+    
+    ipcMain.handle('widget:fetch', async (event, id) => {
+      return await this.fetch(id);
+    });
+
+    ipcMain.handle('widget:pull', async (event, id) => {
+      return await this.pull(id);
+    });
+
+    ipcMain.handle('widget:check-update', async (event, id) => {
+      return await this.checkUpdate(id);
+    });
   }
 
   async create(source, options = {}) {
@@ -181,6 +193,50 @@ class WidgetManager {
       await this.db.write();
     }
     return { success: true };
+  }
+
+  async fetch(id) {
+    const widget = this.db.data.widgets.find(w => w.id === id);
+    if (!widget || widget.type !== 'git') throw new Error('Not a git widget');
+
+    return new Promise((resolve, reject) => {
+      exec('git fetch', { cwd: widget.path }, (error, stdout, stderr) => {
+        if (error) reject(new Error(stderr || error.message));
+        else resolve({ success: true, output: stdout });
+      });
+    });
+  }
+
+  async pull(id) {
+    const widget = this.db.data.widgets.find(w => w.id === id);
+    if (!widget || widget.type !== 'git') throw new Error('Not a git widget');
+
+    return new Promise((resolve, reject) => {
+      exec('git pull', { cwd: widget.path }, (error, stdout, stderr) => {
+        if (error) reject(new Error(stderr || error.message));
+        else resolve({ success: true, output: stdout });
+      });
+    });
+  }
+
+  async checkUpdate(id) {
+    const widget = this.db.data.widgets.find(w => w.id === id);
+    if (!widget || widget.type !== 'git') throw new Error('Not a git widget');
+
+    return new Promise((resolve, reject) => {
+      // First fetch to get latest remote state
+      exec('git fetch', { cwd: widget.path }, (fetchErr) => {
+        if (fetchErr) return reject(new Error('Fetch failed: ' + fetchErr.message));
+
+        // Compare local HEAD with upstream
+        exec('git rev-list HEAD...@{u} --count', { cwd: widget.path }, (err, stdout) => {
+          if (err) return reject(new Error('Revision check failed: ' + err.message));
+          
+          const count = parseInt(stdout.trim(), 10);
+          resolve({ hasUpdate: count > 0, count });
+        });
+      });
+    });
   }
 }
 
