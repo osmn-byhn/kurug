@@ -12,7 +12,6 @@ import {
   Loader,
   CheckCircle2,
   MousePointer2,
-  Scroll,
   Cloud,
   RefreshCw,
   GitBranch,

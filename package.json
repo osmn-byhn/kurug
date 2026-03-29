@@ -1,5 +1,6 @@
 {
-  "name": "kurug",
+  "name": "kurgu",
+  "productName": "Kurgu",
   "private": true,
   "version": "0.0.0",
   "type": "module",

@@ -6,6 +6,14 @@ let WidgetManager;
 
 const isDev = !app.isPackaged;
 
+// Set the application name early so OS shows it instead of "Electron"
+app.setName('Kurgu');
+app.setAppUserModelId('com.kurgu.app');
+
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('class', 'Kurgu');
+}
+
 function createWindow() {
   const iconPath = process.platform === 'win32'
     ? path.join(__dirname, '../public/logo.ico')
@@ -16,6 +24,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    title: 'Kurgu',
     frame: false,
     icon: iconPath,
     webPreferences: {

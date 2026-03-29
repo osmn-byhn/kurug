@@ -37,7 +37,7 @@ const Settings: React.FC = () => {
           Settings
         </h1>
         <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          Customize your Kurug experience
+          Customize your Kurgu experience
         </p>
       </div>
 
@@ -137,7 +137,7 @@ const Settings: React.FC = () => {
 
         <div className="space-y-3">
           {[
-            { label: 'Application', value: 'Kurug' },
+            { label: 'Application', value: 'Kurgu' },
             { label: 'Description', value: 'Desktop widget manager' },
           ].map(({ label, value }) => (
             <div key={label} className="flex items-center justify-between text-sm">
