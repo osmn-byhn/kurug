@@ -25,8 +25,14 @@ class WidgetManager {
     this.db = await JSONFilePreset(this.registryPath, defaultData);
 
     this.setupIpc();
-    
-    // Auto-activate is DISABLED based on user request
+
+    // Reset all active states on startup — no processes are running yet
+    const hadActive = this.db.data.widgets.some(w => w.active);
+    if (hadActive) {
+      this.db.data.widgets.forEach(w => { w.active = false; });
+      await this.db.write();
+    }
+
     console.log('WidgetManager initialized. Auto-activation is disabled.');
   }
 

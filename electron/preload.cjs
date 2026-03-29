@@ -30,4 +30,7 @@ contextBridge.exposeInMainWorld('electron', {
     pull: (id) => ipcRenderer.invoke('widget:pull', id),
     checkUpdate: (id) => ipcRenderer.invoke('widget:check-update', id),
   },
+  dialog: {
+    openFolder: () => ipcRenderer.invoke('dialog:open-folder'),
+  },
 });

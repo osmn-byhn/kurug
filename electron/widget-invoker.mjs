@@ -34,6 +34,9 @@ async function run() {
     else if (action === 'deactivate') {
       console.log(`Deactivating widget with ID: ${id}, URL: ${url}...`);
       const widgets = DesktopWidget.listWidgets();
+      // Match by URL (primary) or ID — the library uses its own internal IDs,
+      // so URL is the most reliable common key. The cascade-kill bug was caused
+      // by pkill -f runner.js (already removed), not by URL matching.
       const targets = widgets.filter(w => w.url === url || w.id === id);
       
       if (targets.length > 0) {
@@ -45,27 +48,22 @@ async function run() {
         }
       }
       
-      // Aggressive fallback: kill any node process that has this URL in its command line
+      // Targeted fallback: kill only processes for this specific URL
       try {
         const { execSync } = await import('child_process');
         if (process.platform !== 'win32') {
-          // Find processes with the URL and kill them
-          console.log(`Attempting aggressive pkill for URL: ${url}`);
-          // We use pkill -f to match the full command line
           try {
-            execSync(`pkill -f "${url}"`);
-            console.log('Aggressive pkill (URL match) successful.');
+            // Escape the URL for shell use
+            const escapedUrl = url.replace(/'/g, "'\\''");
+            execSync(`pkill -f "'${escapedUrl}'"`, { stdio: 'ignore' });
+            console.log('Targeted pkill for this URL successful.');
           } catch (e) {
             console.log('No processes found matching URL.');
           }
-          
-          // Also try pkill -f runner.js just in case
-          try {
-            execSync('pkill -f runner.js');
-          } catch (e) {}
+          // NOTE: Do NOT use `pkill -f runner.js` — it would kill ALL widgets
         }
       } catch (e) {
-        console.error('Error during aggressive pkill:', e);
+        console.error('Error during pkill:', e);
       }
       
       process.exit(0);
