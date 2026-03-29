@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const { updateIfNeeded } = require('@osmn-byhn/changelog-github-updater');
 // const WidgetManager = require('./widget-manager.cjs');
 let WidgetManager;
 
@@ -7,11 +8,11 @@ let WidgetManager;
 const isDev = !app.isPackaged;
 
 // Set the application name early so OS shows it instead of "Electron"
-app.setName('Kurgu');
-app.setAppUserModelId('com.kurgu.app');
+app.setName('Kurug');
+app.setAppUserModelId('com.kurug.app');
 
 if (process.platform === 'linux') {
-  app.commandLine.appendSwitch('class', 'Kurgu');
+  app.commandLine.appendSwitch('class', 'Kurug');
 }
 
 function createWindow() {
@@ -24,7 +25,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    title: 'Kurgu',
+    title: 'Kurug',
     frame: false,
     icon: iconPath,
     webPreferences: {
@@ -67,6 +68,19 @@ ipcMain.on('window-close', (event) => {
 });
 
 app.whenReady().then(async () => {
+  if (!isDev) {
+    updateIfNeeded({
+      owner: 'osmn-byhn',
+      repo: 'Kurug',
+      currentVersion: app.getVersion(),
+      autoInstall: true
+    }).then(result => {
+      if (result && result.updated) {
+        console.log(`Update downloaded! ${result.from} -> ${result.to}`);
+      }
+    }).catch(err => console.error('Auto-updater error:', err));
+  }
+
   const mod = await import('./widget-manager.js');
   WidgetManager = mod.default;
   await WidgetManager.init();
@@ -86,6 +100,24 @@ ipcMain.handle('dialog:open-folder', async (event) => {
   });
   if (result.canceled || result.filePaths.length === 0) return null;
   return result.filePaths[0];
+});
+
+// App update trigger
+ipcMain.handle('app:check-update', async () => {
+  if (isDev) return { updated: false };
+  
+  try {
+    const result = await updateIfNeeded({
+      owner: 'osmn-byhn',
+      repo: 'Kurug',
+      currentVersion: app.getVersion(),
+      autoInstall: true
+    });
+    return result || { updated: false };
+  } catch (error) {
+    console.error('Update check failed:', error);
+    return { updated: false };
+  }
 });
 
 app.on('window-all-closed', () => {

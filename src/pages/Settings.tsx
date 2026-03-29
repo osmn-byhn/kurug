@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import type { Theme } from '../contexts/ThemeContext';
-import { Sun, Moon, Palette, Info } from 'lucide-react';
+import { Sun, Moon, Palette } from 'lucide-react';
 
 interface ThemeOption {
   value: Theme;
@@ -27,6 +27,25 @@ const themeOptions: ThemeOption[] = [
 
 const Settings: React.FC = () => {
   const { theme, setTheme } = useTheme();
+  const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'updated' | 'uptodate' | 'error'>('idle');
+
+  const handleCheckUpdate = async () => {
+    if (updateStatus === 'checking') return;
+    setUpdateStatus('checking');
+    try {
+      const result = await (window as any).electron.app.checkUpdate();
+      if (result && result.updated) {
+        setUpdateStatus('updated');
+      } else {
+        setUpdateStatus('uptodate');
+        setTimeout(() => setUpdateStatus('idle'), 3000);
+      }
+    } catch (e) {
+      console.error(e);
+      setUpdateStatus('uptodate');
+      setTimeout(() => setUpdateStatus('idle'), 3000);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-fade-in pt-2">
@@ -37,7 +56,7 @@ const Settings: React.FC = () => {
           Settings
         </h1>
         <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          Customize your Kurgu experience
+          Customize your Kurug experience
         </p>
       </div>
 
@@ -125,26 +144,53 @@ const Settings: React.FC = () => {
 
       {/* About */}
       <section
-        className="rounded-2xl border p-6 space-y-4"
+        className="rounded-2xl border p-8 flex flex-col items-center justify-center space-y-4 text-center mt-6"
         style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
       >
-        <div className="flex items-center gap-2.5">
-          <Info size={16} style={{ color: 'var(--text-muted)' }} />
-          <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-            About
-          </h2>
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-sm border" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
+          <img src="/logo.png" alt="Kurug Logo" className="w-12 h-12" />
         </div>
 
-        <div className="space-y-3">
-          {[
-            { label: 'Application', value: 'Kurgu' },
-            { label: 'Description', value: 'Desktop widget manager' },
-          ].map(({ label, value }) => (
-            <div key={label} className="flex items-center justify-between text-sm">
-              <span style={{ color: 'var(--text-muted)' }}>{label}</span>
-              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{value}</span>
-            </div>
-          ))}
+        <div>
+          <h2 className="text-xl font-bold tracking-tight mt-1" style={{ color: 'var(--text-primary)' }}>Kurug</h2>
+          <p className="text-xs font-medium uppercase tracking-widest mt-1" style={{ color: 'var(--text-muted)' }}>v1.0.0</p>
+        </div>
+
+        <p className="text-sm max-w-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
+          A modern, cross-platform desktop widget manager. Customize your workspace freely.
+        </p>
+
+        <button
+          onClick={handleCheckUpdate}
+          disabled={updateStatus === 'checking'}
+          className="mt-4 px-4 py-2 rounded-xl text-sm font-medium transition-all border flex items-center justify-center min-w-[160px]"
+          style={{
+            background: updateStatus === 'error' ? 'var(--color-red-500, #fee2e2)' :
+              updateStatus === 'updated' ? 'var(--color-green-500, #dcfce7)' : 'var(--bg)',
+            borderColor: 'var(--border)',
+            color: updateStatus === 'error' ? 'red' :
+              updateStatus === 'updated' ? 'green' : 'var(--text-primary)',
+            opacity: updateStatus === 'checking' ? 0.7 : 1,
+            cursor: updateStatus === 'checking' ? 'wait' : 'pointer'
+          }}
+        >
+          {updateStatus === 'idle' && 'Check for Updates'}
+          {updateStatus === 'checking' && 'Checking...'}
+          {updateStatus === 'updated' && 'Update Ready (Restart)'}
+          {updateStatus === 'uptodate' && 'Up to date!'}
+          {updateStatus === 'error' && 'Failed to update'}
+        </button>
+
+        <div className="w-full h-px my-2" style={{ background: 'var(--border)' }} />
+
+        <div className="flex items-center justify-center gap-4 text-sm mt-2 font-medium">
+          <a href="https://github.com/osmn-byhn" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
+            GitHub
+          </a>
+          <span style={{ color: 'var(--border)' }}>•</span>
+          <a href="https://osmanbeyhan.com" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
+            Website
+          </a>
         </div>
       </section>
     </div>

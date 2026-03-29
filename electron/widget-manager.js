@@ -146,7 +146,8 @@ class WidgetManager {
       const invokerPath = path.join(__dirname, 'widget-invoker.mjs');
       const optionsJson = JSON.stringify(widgetData.options);
       
-      const child = spawn('node', [invokerPath, 'activate', id, url, optionsJson], {
+      const child = spawn(process.execPath, [invokerPath, 'activate', id, url, optionsJson], {
+        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
         stdio: 'inherit'
       });
 
@@ -174,7 +175,8 @@ class WidgetManager {
       }
 
       await new Promise((resolve) => {
-        const child = spawn('node', [invokerPath, 'deactivate', id, url], {
+        const child = spawn(process.execPath, [invokerPath, 'deactivate', id, url], {
+          env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
           stdio: 'inherit'
         });
         child.on('exit', () => resolve());

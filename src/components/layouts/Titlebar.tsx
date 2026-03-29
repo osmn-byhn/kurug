@@ -18,7 +18,7 @@ const Titlebar: React.FC = () => {
             } as any}
         >
             <div className="flex items-center px-4">
-                <img src="/logo.png" alt="Kurgu" className="w-8 h-8" />
+                <img src="/logo.png" alt="Kurug" className="w-8 h-8" />
             </div>
 
             <div className="flex h-full" style={{ WebkitAppRegion: 'no-drag' } as any}>
