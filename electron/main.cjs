@@ -73,7 +73,7 @@ app.whenReady().then(async () => {
       owner: 'osmn-byhn',
       repo: 'Kurug',
       currentVersion: app.getVersion(),
-      autoInstall: true
+      autoInstall: false
     }).then(result => {
       if (result && result.updated) {
         console.log(`Update downloaded! ${result.from} -> ${result.to}`);
