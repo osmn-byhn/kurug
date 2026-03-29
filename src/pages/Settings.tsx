@@ -148,7 +148,7 @@ const Settings: React.FC = () => {
         style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
       >
         <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-sm border" style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
-          <img src="/logo.png" alt="Kurug Logo" className="w-12 h-12" />
+          <img src="./logo.png" alt="Kurug Logo" className="w-12 h-12" />
         </div>
 
         <div>
@@ -184,11 +184,11 @@ const Settings: React.FC = () => {
         <div className="w-full h-px my-2" style={{ background: 'var(--border)' }} />
 
         <div className="flex items-center justify-center gap-4 text-sm mt-2 font-medium">
-          <a href="https://github.com/osmn-byhn" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
+          <a href="https://github.com/osmn-byhn/kurug" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
             GitHub
           </a>
           <span style={{ color: 'var(--border)' }}>•</span>
-          <a href="https://osmanbeyhan.com" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
+          <a href="https://kurug.osmanbeyhan.com" target="_blank" rel="noreferrer" className="hover:underline transition-colors" style={{ color: 'var(--color-indigo-500)' }}>
             Website
           </a>
         </div>

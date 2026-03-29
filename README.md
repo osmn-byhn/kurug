@@ -1,73 +1,90 @@
-# React + TypeScript + Vite
+<p align="center">
+  <img src="./public/logo.png" width="128" alt="Kurug Logo" />
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1 align="center">Kurug</h1>
 
-Currently, two official plugins are available:
+<p align="center">
+  <strong>Modern, Flexible and Powerful Desktop Widget Manager</strong>
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20Mac-blueviolet?style=for-the-badge" alt="Platform" />
+  <img src="https://img.shields.io/badge/Stack-React%20%7C%20Electron%20%7C%20Vite-61dafb?style=for-the-badge" alt="Stack" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
+</p>
 
-## React Compiler
+## 🌟 What is Kurug?
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Kurug** is an open-source, modern widget management platform designed to make your desktop entirely personal. Whether it's weather, a stock ticker, or just a stylish clock; Kurug allows you to place any content prepared with web technologies (HTML, JS, CSS) directly on your desktop as a persistent and interactive "widget".
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* **🚀 Multi-Source Support:**
+  * **Git Repositories:** Paste GitHub, GitLab, or Bitbucket links; Kurug automatically clones and runs them.
+  * **Direct URLs:** Instantly turn any website or web application into a widget.
+  * **Local Folders:** Directly link local projects you've developed on your computer.
+* **🛡️ Isolated Execution:** Each widget runs as an independent process from the main application. If one widget crashes, others or the main app remain unaffected.
+* **🎨 Modern Design:** The interface, prepared with glassmorphism aesthetics, fits perfectly into your system with both Dark and Light theme options.
+* **🛠️ Easy Management:** Manage all your widgets from a single panel. Toggle them all on/off with one click or customize their settings (size, position, opacity).
+* **📦 Native Performance:** Provides low resource consumption and high performance through native file access, bypassing heavy packaging methods.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ How to Use?
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Add Widget:** Click the **"Add Widget"** button on the home screen.
+2. **Define Source:**
+    * You can enter a Git link (Kurug downloads it for you).
+    * You can select a folder.
+    * Or just enter a URL.
+3. **Activation:** Turn on the switch next to the widget added to the list. Your widget will appear on your desktop in seconds!
+4. **Personalization:** Click the "Settings" icon to adjust the size and position of the widget on the screen as you wish.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🏗️ Technical Architecture
+
+Kurug is built with the most modern web technologies:
+
+* **Frontend:** React 19 + TypeScript + Vite (Ultra-fast development and build process).
+* **Styling:** Tailwind CSS (Modern and flexible design system).
+* **Runtime:** Electron (Native desktop integration).
+* **Engine:** `@osmn-byhn/widget-core` (Custom engine for widget isolation and system integration).
+* **Database:** LowDB (Fast and reliable local data storage).
+
+## 🚀 Development and Installation
+
+To run the project locally:
+
+```bash
+# Install dependencies
+npm install
+
+# Start in development mode
+npm run electron:dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Packaging (Build)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Kurug has optimized packaging scripts for different operating systems:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# For Windows (.exe)
+npm run package:win
+
+# For Debian/Ubuntu (.deb)
+npm run package:deb
+
+# For Fedora/RedHat (.rpm)
+npm run package:rpm
+
+# For macOS (.dmg)
+npm run package:mac
 ```
+
+## 📄 License
+
+This project is licensed under the **MIT** License - see the [LICENSE](LICENSE) file for details.
+
+---
+<p align="center">
+  Crafted with ❤️ by <a href="https://github.com/osmn-byhn">Osman Beyhan</a>
+</p>

@@ -1,0 +1,27 @@
+directories:
+  output: releases
+  buildResources: build
+asar: false
+appId: com.kurug.app
+productName: Kurug
+files:
+  - filter:
+      - dist/**/*
+      - electron/**/*
+      - public/**/*
+      - package.json
+linux:
+  target:
+    - rpm
+    - deb
+  icon: public/logo.png
+  category: Utility
+  executableName: kurug
+win:
+  target: nsis
+  icon: public/logo.png
+mac:
+  target:
+    - dmg
+    - zip
+  icon: public/logo.icns
