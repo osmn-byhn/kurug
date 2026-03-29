@@ -14,6 +14,7 @@ linux:
   target:
     - rpm
     - deb
+    - AppImage
   icon: public/logo.png
   category: Utility
   executableName: kurug

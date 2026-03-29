@@ -76,6 +76,9 @@ npm run package:deb
 # For Fedora/RedHat (.rpm)
 npm run package:rpm
 
+# For AppImage (.AppImage)
+npm run package:appimage
+
 # For macOS (.dmg)
 npm run package:mac
 ```

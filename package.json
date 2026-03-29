@@ -17,7 +17,8 @@
     "package:rpm": "npm run build && electron-builder --linux rpm -c.directories.output=releases",
     "package:deb": "npm run build && electron-builder --linux deb -c.directories.output=releases",
     "package:win": "npm run build && electron-builder --win nsis -c.directories.output=releases",
-    "package:mac": "npm run build && electron-builder --mac dmg -c.directories.output=releases"
+    "package:mac": "npm run build && electron-builder --mac dmg -c.directories.output=releases",
+    "package:appimage": "npm run build && electron-builder --linux AppImage -c.directories.output=releases"
   },
   "dependencies": {
     "@osmn-byhn/changelog-github-updater": "^1.0.3",
