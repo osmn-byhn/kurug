@@ -39,6 +39,19 @@ interface Widget {
   };
 }
 
+type WidgetCodeConfig = {
+  css: Record<string, string>;
+  js: Record<string, string>;
+  env: Record<string, string>;
+  widget: Record<string, string>;
+};
+
+const asConfigMap = (value: unknown, rawKey: string): Record<string, string> => {
+  if (typeof value === 'string') return value ? { [rawKey]: value } : {};
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([, entry]) => typeof entry === 'string')) as Record<string, string>;
+};
+
 const WidgetSettings: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -60,6 +73,7 @@ const WidgetSettings: React.FC = () => {
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [hasUpdate, setHasUpdate] = useState(false);
   const [gitStatus, setGitStatus] = useState<{ type: 'success' | 'error' | 'info', message: string } | null>(null);
+  const [widgetConfig, setWidgetConfig] = useState<WidgetCodeConfig>({ css: {}, js: {}, env: {}, widget: {} });
 
   useEffect(() => {
     if (id) {
@@ -72,6 +86,8 @@ const WidgetSettings: React.FC = () => {
       const data = await (window as any).electron.widget.get(widgetId);
       if (data) {
         setWidget(data);
+        const config = await window.electron.widget.getConfig(widgetId);
+        setWidgetConfig({ css: asConfigMap(config.css, ''), js: asConfigMap(config.js, ''), env: asConfigMap(config.env, ''), widget: asConfigMap(config.widget, '') });
         setName(data.name);
         setWidth(data.options.width || 400);
         setHeight(data.options.height || 300);
@@ -93,6 +109,7 @@ const WidgetSettings: React.FC = () => {
     if (!id || !widget) return;
     setSaving(true);
     try {
+      await window.electron.widget.setConfig(id, widgetConfig);
       const updates = {
         name,
         options: {
@@ -107,7 +124,12 @@ const WidgetSettings: React.FC = () => {
           blur: Number(blur)
         }
       };
-      await (window as any).electron.widget.update(id, updates);
+      const updatedWidget = await window.electron.widget.update(id, updates);
+      setWidget(updatedWidget);
+      if (widget.active) {
+        await window.electron.widget.deactivate(id);
+        await window.electron.widget.activate(id);
+      }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (e) {
@@ -116,6 +138,40 @@ const WidgetSettings: React.FC = () => {
       setSaving(false);
     }
   };
+
+  const updateConfigMap = (section: 'css' | 'js' | 'env' | 'widget', oldKey: string, key: string, value: string) => {
+    setWidgetConfig((current) => {
+      const entries = { ...current[section] };
+      if (oldKey !== key) delete entries[oldKey];
+      if (key.trim()) entries[key] = value;
+      return { ...current, [section]: entries };
+    });
+  };
+
+  const addConfigMapEntry = (section: 'css' | 'js' | 'env' | 'widget') => {
+    const base = section === 'css' ? 'backgroundColor' : section === 'js' ? 'example' : section === 'widget' ? 'title' : 'NEW_KEY';
+    let key = base;
+    let suffix = 2;
+    while (key in widgetConfig[section]) key = `${base}_${suffix++}`;
+    setWidgetConfig((current) => ({ ...current, [section]: { ...current[section], [key]: section === 'css' ? 'transparent' : '' } }));
+  };
+
+  const renderConfigMap = (section: 'css' | 'js' | 'env' | 'widget', title: string, keyHint: string, valueHint: string) => (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{title}</h3>
+        <button type="button" onClick={() => addConfigMapEntry(section)} className="text-[11px] text-indigo-400 hover:text-indigo-300">+ Key ekle</button>
+      </div>
+      {Object.entries(widgetConfig[section]).map(([key, value], index) => (
+        <div key={`${section}-${index}`} className="grid grid-cols-[minmax(110px,0.8fr)_minmax(0,1.6fr)_32px] gap-2">
+          <input aria-label={`${title} key`} className="input-field h-9 text-xs bg-black/20 border border-border/40" placeholder={keyHint} value={key} onChange={(event) => updateConfigMap(section, key, event.target.value, value)} />
+          <input aria-label={`${title} value`} className="input-field h-9 text-xs bg-black/20 border border-border/40 font-mono" placeholder={valueHint} value={value} onChange={(event) => updateConfigMap(section, key, key, event.target.value)} />
+          <button type="button" aria-label={`${title} satırını sil`} onClick={() => setWidgetConfig((current) => { const entries = { ...current[section] }; delete entries[key]; return { ...current, [section]: entries }; })} className="rounded-lg border border-border/40 text-gray-500 hover:text-red-400">×</button>
+        </div>
+      ))}
+      {Object.keys(widgetConfig[section]).length === 0 && <p className="text-[11px] text-gray-600">Henüz ayar yok.</p>}
+    </div>
+  );
 
   const handleDelete = async () => {
     if (!id) return;
@@ -290,6 +346,19 @@ const WidgetSettings: React.FC = () => {
 
       {/* Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <section className="md:col-span-2 bg-surface/30 border border-border/40 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Settings className="text-indigo-400" size={15} />
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Widget config.json · CSS / ENV / Widget</h2>
+          </div>
+          <p className="text-[11px] text-gray-500">Yerel ve Git widget’larında config.json widget klasöründe saklanır. URL widget’ları için uygulamanın widgets/configs klasörü kullanılır. Ayarları anahtar ve değer kutularından düzenleyin.</p>
+          {renderConfigMap('css', 'CSS · Özellik / değer', 'backgroundColor', 'transparent')}
+          {renderConfigMap('widget', 'Widget · Alan / değer', 'title', 'Widget başlığı')}
+          {renderConfigMap('env', 'ENV · Key / value', 'API_KEY', 'your-api-key')}
+          {renderConfigMap('js', 'JS · Window key / value', 'themeName', 'dark')}
+          <p className="text-[11px] text-amber-400/80">JS key/value değerleri widget penceresinde window değişkenleri olarak sunulur. Uzak iframe’in iç stilleri kaynak sayfada düzenlenmelidir.</p>
+        </section>
 
         {/* Basic Info */}
         <section className="bg-surface/30 border border-border/40 rounded-2xl p-5 space-y-4">
@@ -504,7 +573,7 @@ const WidgetSettings: React.FC = () => {
         <div>
           <h4 className="text-xs font-semibold text-white mb-1">Applying Changes</h4>
           <p className="text-[11px] text-gray-500 leading-relaxed">
-            Size and position changes may require restarting the widget to take effect. Some changes apply instantly.
+            Saving settings automatically restarts this widget if it is currently running, so the latest changes take effect immediately.
           </p>
         </div>
       </div>

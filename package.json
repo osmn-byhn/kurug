@@ -12,7 +12,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "electron:dev": "concurrently --kill-others --handle-input \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:dev": "node electron/dev.cjs",
     "widget:stop-all": "node electron/stop-all.mjs",
     "package:rpm": "npm run build && electron-builder --linux rpm -c.directories.output=releases",
     "package:deb": "npm run build && electron-builder --linux deb -c.directories.output=releases",

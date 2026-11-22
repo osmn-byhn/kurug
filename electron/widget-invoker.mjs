@@ -1,5 +1,6 @@
 import { DesktopWidget } from '@osmn-byhn/widget-core';
 import process from 'process';
+import path from 'path';
 
 const action = process.argv[2];
 const id = process.argv[3];
@@ -27,8 +28,30 @@ async function run() {
       console.log(`New widget instance created with library ID: ${widget.id}`);
       
       await widget.makePersistent(options);
-      widget.launchStandalone();
-      console.log('Widget launched standalone and persistence enabled.');
+
+      // Robust spawn for packaged environments (Windows/Linux/OSX)
+      // widget.launchStandalone() in the library attempts to spawn "node" directly,
+      // which fails if node isn't in PATH. We use process.execPath instead.
+      const { spawn } = await import('child_process');
+      const { fileURLToPath } = await import('url');
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      
+      // Find the runner.js path in the library
+      // In production, this will be in node_modules/@osmn-byhn/widget-core/dist/runner.js
+      const runnerPath = path.join(__dirname, '..', 'node_modules', '@osmn-byhn/widget-core', 'dist', 'runner.js');
+      
+      console.log(`Bypassing library launchStandalone, manually spawning runner: ${runnerPath}`);
+      
+      const child = spawn(process.execPath, [runnerPath, widget.id], {
+        env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' },
+        detached: true,
+        stdio: 'ignore'
+      });
+      
+      child.unref();
+      
+      console.log('Widget runner spawned manually with Electron Node environment.');
       process.exit(0);
     } 
     else if (action === 'deactivate') {
@@ -46,24 +69,6 @@ async function run() {
           DesktopWidget.deactivateById(target.id);
           DesktopWidget.removeById(target.id);
         }
-      }
-      
-      // Targeted fallback: kill only processes for this specific URL
-      try {
-        const { execSync } = await import('child_process');
-        if (process.platform !== 'win32') {
-          try {
-            // Escape the URL for shell use
-            const escapedUrl = url.replace(/'/g, "'\\''");
-            execSync(`pkill -f "'${escapedUrl}'"`, { stdio: 'ignore' });
-            console.log('Targeted pkill for this URL successful.');
-          } catch (e) {
-            console.log('No processes found matching URL.');
-          }
-          // NOTE: Do NOT use `pkill -f runner.js` — it would kill ALL widgets
-        }
-      } catch (e) {
-        console.error('Error during pkill:', e);
       }
       
       process.exit(0);
