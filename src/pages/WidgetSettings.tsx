@@ -31,7 +31,7 @@ interface Widget {
     height: number;
     x: number;
     y: number;
-    opacity: number;
+    opacity?: number;
     interactive?: boolean;
     scroll?: boolean;
     blur?: number;
