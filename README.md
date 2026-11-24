@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge" alt="Version" />
+  <img src="https://img.shields.io/badge/Version-1.0.1-blue?style=for-the-badge" alt="Version" />
   <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20Mac-blueviolet?style=for-the-badge" alt="Platform" />
   <img src="https://img.shields.io/badge/Stack-React%20%7C%20Electron%20%7C%20Vite-61dafb?style=for-the-badge" alt="Stack" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
@@ -81,7 +81,12 @@ npm run package:appimage
 
 # For macOS (.dmg)
 npm run package:mac
+
+# For Linux (.deb, .rpm, .AppImage)
+npm run package:linux
 ```
+
+Tagged releases are built on native GitHub Actions runners for Linux, Windows, and macOS, then attached to a GitHub Release.
 
 ## 📄 License
 
